@@ -1,7 +1,7 @@
 # LibreOffice macros for tournament organization
 This repository contains a set of several python macros that can be used in LibreOffice Calc to organize a match-based tournament (i.e. pairs of competitors have matches which determine one winner) consisting of a group phase and a single-elimination phase.
 
-Developed for the purposes of organizing small (HEMA) tournaments.
+Developed for the purposes of organizing small [HEMA](https://en.wikipedia.org/wiki/Historical_European_martial_arts) tournaments.
 
 ## Installation
 Just clone (or downlad) this repository into the python scripts folder for your LibreOffice, which is
