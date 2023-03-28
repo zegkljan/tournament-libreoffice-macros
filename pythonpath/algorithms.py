@@ -15,13 +15,15 @@ def findGroupSizes(n_total: int, max_group_size: int) -> List[int]:
     n = n_total // max_group_size
     if rem == 0:
         return [max_group_size] * n
-    if max_group_size <= 4:
+    elif max_group_size <= 4:
         raise ValueError('Cannot arrange groups - largest group would be smaller than 4.')
-    if n + 1 >= max_group_size - rem:
+    elif n + 1 >= max_group_size - rem:
         groups = [max_group_size] * (n + 1 - (max_group_size - rem))
         groups += [max_group_size - 1] * (max_group_size - rem)
+        groups.sort()
         return groups
-    return findGroupSizes(n_total, max_group_size - 1)
+    else:
+        return findGroupSizes(n_total, max_group_size - 1)
 
 
 def assignGroups(group_sizes: List[int], participants: List[T]) -> List[List[T]]:
@@ -31,19 +33,24 @@ def assignGroups(group_sizes: List[int], participants: List[T]) -> List[List[T]]
     """
     min_size = min(group_sizes)
     groups = [[] for _ in range(len(group_sizes))]
+    assigned = 0
     g = 0
     d = 0
-    for i, p in enumerate(participants):
-        groups[g].append(p)
+    i = 0
+    while i < len(participants):
+        p = participants[i]
+        if group_sizes[g] > len(groups[g]):
+            groups[g].append(p)
+            assigned += 1
+            i += 1
         if g == 0 or g == len(groups) - 1:
             if g != 0:
                 d -= 1
             elif g != len(groups) - 1:
                 d += 1
         g += d
-        if (i + 1) / len(group_sizes) == min_size and min_size % 2 == 1:
-            g = group_sizes.index(min_size) - 1
-            d -= 1
+    if assigned != len(participants):
+        raise ValueError('not all participants assigned - this should not happen')
     return groups
 
 

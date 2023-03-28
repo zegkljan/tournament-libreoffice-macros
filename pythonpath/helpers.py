@@ -160,8 +160,8 @@ def createGroups(doc, participants):
 
         # write group into summary of all groups
         group_row = (i // groups_per_row) * (1 + max_group_size)
-        group_col = (i % groups_per_row) * 2
-        header_range = group_list_sheet.getCellRangeByPosition(group_col, group_row, group_col + 1, group_row)
+        group_col = (i % groups_per_row) * 3
+        header_range = group_list_sheet.getCellRangeByPosition(group_col, group_row, group_col + 2, group_row)
         header_range.merge(True)
         header_range.TopBorder2 = header_range.RightBorder2 = header_range.BottomBorder2 = header_range.LeftBorder2 = medium_border
         group_list_sheet.getCellByPosition(group_col, group_row).setString(group_name)
@@ -189,15 +189,18 @@ def createGroups(doc, participants):
         grp_sheet.getCellRangeByPosition(*_add(table_coords, 1, 0), *_add(table_coords, 1, 1 + len(group) - 1)).CellStyle = 'scoring_table_name'
         grp_sheet.getCellRangeByPosition(*_add(table_coords, 2, 0), *_add(table_coords, 2 + len(group) - 1 + 4, 1 + len(group) - 1)).CellStyle = 'scoring_table_inner'
         for j, p in enumerate(group):
+            participant_ref = _getParticipantReference(p)
+            club_ref = _getParticipantClubReference(p)
+
             # write into summary group list
             num_cell = group_list_sheet.getCellByPosition(group_col, group_row + 1 + j)
             num_cell.setValue(j + 1)
             num_cell.LeftBorder2 = medium_border
             name_cell = group_list_sheet.getCellByPosition(group_col + 1, group_row + 1 + j)
-            participant_ref = _getParticipantReference(p)
-            club_ref = _getParticipantClubReference(p)
             name_cell.setFormula('={}'.format(participant_ref))
-            name_cell.RightBorder2 = medium_border
+            club_cell = group_list_sheet.getCellByPosition(group_col + 2, group_row + 1 + j)
+            club_cell.setFormula('={}'.format(club_ref))
+            club_cell.RightBorder2 = medium_border
             
             # write into scoring table
             # number column
@@ -236,7 +239,7 @@ def createGroups(doc, participants):
             # when we are done
             if j == len(group) - 1:
                 # close off bottom border in summary group list
-                num_cell.BottomBorder2 = name_cell.BottomBorder2 = medium_border
+                num_cell.BottomBorder2 = name_cell.BottomBorder2 = club_cell.BottomBorder2 = medium_border
                 
                 # set column widths in scoring table
                 for k in range(len(group) + 6):
@@ -309,9 +312,10 @@ def createGroups(doc, participants):
         grp_sheet.Columns[table_coords[0] + 2 + len(group) + 2].IsVisible = False
     
     for i in range(len(groups)):
-        group_col = (i % groups_per_row) * 2
+        group_col = (i % groups_per_row) * 3
         group_list_sheet.Columns[group_col].OptimalWidth = True
         group_list_sheet.Columns[group_col + 1].OptimalWidth = True
+        group_list_sheet.Columns[group_col + 2].OptimalWidth = True
     
     group_results_sheet.Columns[0].OptimalWidth = True
     group_results_sheet.Columns[1].OptimalWidth = True
@@ -397,21 +401,21 @@ def createElimination(doc, participants):
 
             if ln == 0:
                 if layer[i][0] is None:
-                    top_score_cell.setValue(0)
+                    top_score_cell.setValue(-1)
                 else:
                     top_number_cell.setFormula("=$'{}'.A{}".format(constants.GROUPS_RESULTS, layer[i][0] + 2))
                     top_name_cell.setFormula("=$'{}'.B{}".format(constants.GROUPS_RESULTS, layer[i][0] + 2))
                     top_club_cell.setFormula("=$'{}'.C{}".format(constants.GROUPS_RESULTS, layer[i][0] + 2))
                     if layer[i][1] is None:
-                        top_score_cell.setValue(1)
+                        top_score_cell.setValue(0)
                 if layer[i][1] is None:
-                    bottom_score_cell.setValue(0)
+                    bottom_score_cell.setValue(-1)
                 else:
                     bottom_number_cell.setFormula("=$'{}'.A{}".format(constants.GROUPS_RESULTS, layer[i][1] + 2))
                     bottom_name_cell.setFormula("=$'{}'.B{}".format(constants.GROUPS_RESULTS, layer[i][1] + 2))
                     bottom_club_cell.setFormula("=$'{}'.C{}".format(constants.GROUPS_RESULTS, layer[i][1] + 2))
                     if layer[i][0] is None:
-                        bottom_score_cell.setValue(1)
+                        bottom_score_cell.setValue(0)
             else:
                 vert_bracket_len = 2 * (2**(ln - 1) - 1)
                 if vert_bracket_len > 0:
@@ -651,7 +655,7 @@ def createElimination(doc, participants):
             el.Columns[col + 1].Width = name_width
             el.Columns[col + 2].Width = club_width
         el.Columns[col + 2].IsVisible = False
-        el.Columns[col + 3].Width = 100_0
+        el.Columns[col + 3].Width = 278_0
         if finish:
             break
         layer = next_layer
