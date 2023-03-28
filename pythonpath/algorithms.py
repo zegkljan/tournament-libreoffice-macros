@@ -72,20 +72,20 @@ def makeGroupCircle(group: List[T]) -> List[Tuple[T, T]]:
         group = [None] + group
     schedule = []
     circle = list(group)
-    schedule.extend([(circle[i], circle[len(circle) - i - 1])
-                     for i in range(len(group) // 2)
-                     if circle[i] is not None and circle[len(circle) - i - 1] is not None
-                    ])
+    round = [(circle[i], circle[len(circle) - i - 1]) 
+             for i in range(len(group) // 2)
+             if circle[i] is not None and circle[len(circle) - i - 1] is not None
+            ]
+    schedule.extend(reversed(round))
     for k in range(len(group) - 2):
-        tmp = circle[-1]
-        circle[2:] = circle[1:-1]
-        circle[1] = tmp
+        circle = [circle[0], circle[-1]] + circle[1:-1]
         if k % 2 == 0:
             circle[0], circle[-1] = circle[-1], circle[0]
-        schedule.extend([(circle[i], circle[len(circle) - i - 1])
-                         for i in range(len(group) // 2)
-                         if circle[i] is not None and circle[len(circle) - i - 1] is not None
-                        ])
+        round = [(circle[i], circle[len(circle) - i - 1])
+                 for i in range(len(group) // 2)
+                 if circle[i] is not None and circle[len(circle) - i - 1] is not None
+                ]
+        schedule.extend(reversed(round))
         if k % 2 == 0:
             circle[0], circle[-1] = circle[-1], circle[0]
             
@@ -157,7 +157,7 @@ def makeGroupOdd(group):
     while True:
         most = max(nums_first.items(), key=lambda x: x[1])[0]
         least = min(nums_first.items(), key=lambda x: x[1])[0]
-        if nums_first[most] - nums_first[least] > 1:
+        if nums_first[most] - nums_first[least] > 0:
             for i, (a, b) in enumerate(group):
                 if a == most and b == least:
                     group[i] = (b, a)
@@ -167,7 +167,7 @@ def makeGroupOdd(group):
         else:
             break
     
-    return group
+    return reversed(group)
 
 
 def makeElimination(participants: List[T]) -> List[Tuple[Optional[T], Optional[T]]]:
