@@ -1,8 +1,10 @@
 # coding: utf-8
 
 import math
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Sequence, Callable, Any
 import typing
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import maximum_bipartite_matching
 
 T = typing.TypeVar('T')
 
@@ -26,31 +28,54 @@ def findGroupSizes(n_total: int, max_group_size: int) -> List[int]:
         return findGroupSizes(n_total, max_group_size - 1)
 
 
-def assignGroups(group_sizes: List[int], participants: List[T]) -> List[List[T]]:
+def assignGroups(group_sizes: List[int], participants: List[T], spreadCriteriaGetters: List[Callable[[T], Any]]) -> List[List[T]]:
     """Assigns participants into groups of the given sizes.
 
-    Uses the 'snake' algorithm, assuming that participants are already sorted by the desired ranking.
+    Tries to not put people who have the same value of spread criteria into the same groups.
+    Where not possible, tends towards the 'snake' algorithm.
+    Assumes that participants are already sorted by the desired ranking.
     """
-    min_size = min(group_sizes)
     groups = [[] for _ in range(len(group_sizes))]
-    assigned = 0
-    g = 0
-    d = 0
-    i = 0
-    while i < len(participants):
-        p = participants[i]
-        if group_sizes[g] > len(groups[g]):
-            groups[g].append(p)
-            assigned += 1
-            i += 1
-        if g == 0 or g == len(groups) - 1:
-            if g != 0:
-                d -= 1
-            elif g != len(groups) - 1:
-                d += 1
-        g += d
-    if assigned != len(participants):
-        raise ValueError('not all participants assigned - this should not happen')
+
+    def getLeastFilled():
+        least = []
+        for i, g in enumerate(groups):
+            if len(g) == group_sizes[i]:
+                continue
+            if not least or len(g) < len(least[0]):
+                least = [g]
+            elif len(g) == len(least[0]):
+                least.append(g)
+        return least
+    
+    def assign(grps, parts, nCriteria):
+        assert len(grps) == len(parts)
+        m = csr_matrix([[1] * len(parts)] * len(grps))
+        for ig, g in enumerate(grps):
+            for ip, p in enumerate(parts):
+                for gm in g:
+                    if any((c(gm) == c(p) for c in spreadCriteriaGetters[:nCriteria])):
+                        m[ig, ip] = 0
+                        break
+        m.eliminate_zeros()
+        res = maximum_bipartite_matching(m, perm_type='row')
+        return list(res)
+
+    layer = 0
+    participants = list(participants)
+    while participants:
+        least = getLeastFilled()
+        if layer % 2 == 1:
+            least = list(reversed(least))
+        ps, participants = participants[:len(least)], participants[len(least):]
+        assignment = None
+        for critCounter in range(len(spreadCriteriaGetters) + 1):
+            assignment = assign(least, ps, len(spreadCriteriaGetters) - critCounter)
+            if all((x >= 0 for x in assignment)):
+                break
+        for i, n in enumerate(assignment):
+            least[n].append(ps[i])
+        layer += 1
     return groups
 
 

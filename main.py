@@ -38,8 +38,9 @@ def init():
     ## init participant list
     plist.getCellByPosition(0, 0).setString('Name')
     plist.getCellByPosition(1, 0).setString('Club')
-    plist.getCellByPosition(2, 0).setString('Rating/rank')
-    plist.getCellByPosition(3, 0).setString('Present?')
+    plist.getCellByPosition(2, 0).setString('Country')
+    plist.getCellByPosition(3, 0).setString('Rating/rank')
+    plist.getCellByPosition(4, 0).setString('Present?')
     
     ## init settings sheet
     settings.getCellByPosition(0, 0).setString('Max group size')

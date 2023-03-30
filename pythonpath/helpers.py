@@ -11,7 +11,7 @@ import algorithms
 import constants
 
 
-Participant = namedtuple('Participant', ['row', 'name', 'club', 'rating'])
+Participant = namedtuple('Participant', ['row', 'name', 'club', 'country', 'rating'])
 
 
 def _printDir(x, grep='.*'):
@@ -37,11 +37,12 @@ def loadParticipants(doc):
         row = i + 1
         name = plist.getCellByPosition(0, row).getString()
         club = plist.getCellByPosition(1, row).getString()
-        rating = plist.getCellByPosition(2, row).getValue()
-        present = plist.getCellByPosition(3, row).getString()
+        country = plist.getCellByPosition(2, row).getString()
+        rating = plist.getCellByPosition(3, row).getValue()
+        present = plist.getCellByPosition(4, row).getString()
         
         if present == 'y':
-            participants.append(Participant(row, name, club, rating))
+            participants.append(Participant(row, name, club, country, rating))
         if not name:
                 break
         i += 1
@@ -134,7 +135,7 @@ def createGroups(doc, participants):
         sort_key = lambda x: -x.rating
     
     group_sizes = algorithms.findGroupSizes(len(participants), max_group_size)
-    groups = algorithms.assignGroups(group_sizes, sorted(participants, key=sort_key))
+    groups = algorithms.assignGroups(group_sizes, sorted(participants, key=sort_key), [(lambda p: p.club), (lambda p: p.country)])
     max_group_size = max(group_sizes)
     
     group_list_sheet = addSheet(doc, constants.GROUP_LIST, 2)
