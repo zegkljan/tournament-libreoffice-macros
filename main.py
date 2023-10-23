@@ -30,19 +30,14 @@ def init():
 
     # create participant list sheet
     plist = helpers.addSheet(doc, constants.PARTICIPANT_LIST, 0)
-    # create settings sheet
-    settings = helpers.addSheet(doc, constants.SETTINGS, 1)
-    # remove the last sheet
-    doc.Sheets.removeByName(doc.Sheets[-1].getName())
-    
-    ## init participant list
     plist.getCellByPosition(0, 0).setString('Name')
     plist.getCellByPosition(1, 0).setString('Club')
     plist.getCellByPosition(2, 0).setString('Country')
     plist.getCellByPosition(3, 0).setString('Rating/rank')
     plist.getCellByPosition(4, 0).setString('Present?')
-    
-    ## init settings sheet
+
+    # create settings sheet
+    settings = helpers.addSheet(doc, constants.SETTINGS, 1)
     settings.getCellByPosition(0, 0).setString('Max group size')
     settings.getCellByPosition(1, 0).setValue(7)
     settings.getCellByPosition(0, 1).setString('Groups per row')
@@ -53,6 +48,9 @@ def init():
     settings.getCellByPosition(1, 3).setValue(1)
     settings.Columns[0].OptimalWidth = True
 
+    # remove the last sheet
+    doc.Sheets.removeByName(doc.Sheets[-1].getName())
+    
     ## set focus to participant list
     doc.getCurrentController().setActiveSheet(plist)
 

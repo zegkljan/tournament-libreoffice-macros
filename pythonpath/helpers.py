@@ -534,7 +534,7 @@ def createElimination(doc, participants):
                     if list_of_fights.getCellByPosition(0, k).getString() == '':
                         break
                     k += 1
-                list_of_fights.getCellByPosition(0, k).setString('Final')
+                list_of_fights.getCellByPosition(0, k).setString(constants.FINAL)
                 list_of_fights.getCellByPosition(1, k).setFormula("=IF(ISBLANK($'{0}'.{1}); \"\"; $'{0}'.{1})".format(constants.ELIMINATION, top_name_cell_addr))
                 list_of_fights.getCellByPosition(2, k).setFormula("=IF(ISBLANK($'{0}'.{1}); \"\"; $'{0}'.{1})".format(constants.ELIMINATION, bottom_name_cell_addr))
                 list_of_fights.getCellByPosition(3, k).setFormula("=IF(ISBLANK($'{0}'.{1}); \"\"; $'{0}'.{1})".format(constants.ELIMINATION, top_score_cell_addr))
@@ -624,7 +624,7 @@ def createElimination(doc, participants):
                     if list_of_fights.getCellByPosition(0, k).getString() == '':
                         break
                     k += 1
-                list_of_fights.getCellByPosition(0, k).setString('Small final')
+                list_of_fights.getCellByPosition(0, k).setString(constants.SMALL_FINAL)
                 list_of_fights.getCellByPosition(1, k).setFormula("=IF(ISBLANK($'{0}'.{1}); \"\"; $'{0}'.{1})".format(constants.ELIMINATION, top_name_cell_addr))
                 list_of_fights.getCellByPosition(2, k).setFormula("=IF(ISBLANK($'{0}'.{1}); \"\"; $'{0}'.{1})".format(constants.ELIMINATION, bottom_name_cell_addr))
                 list_of_fights.getCellByPosition(3, k).setFormula("=IF(ISBLANK($'{0}'.{1}); \"\"; $'{0}'.{1})".format(constants.ELIMINATION, top_score_cell_addr))
