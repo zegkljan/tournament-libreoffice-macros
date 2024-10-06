@@ -9,7 +9,7 @@ from scipy.sparse.csgraph import maximum_bipartite_matching
 T = typing.TypeVar('T')
 
 
-def findGroupSizes(n_total: int, max_group_size: int) -> List[int]:
+def findGroupSizes(n_total: int, max_group_size: int, large_groups_first: bool) -> List[int]:
     """Based on the total number of participants and maximum allowed size of a group,
     determines sizes of individual groups.
     """
@@ -21,11 +21,13 @@ def findGroupSizes(n_total: int, max_group_size: int) -> List[int]:
         raise ValueError('Cannot arrange groups - largest group would be smaller than 4.')
     elif n + 1 >= max_group_size - rem:
         groups = [max_group_size] * (n + 1 - (max_group_size - rem))
-        groups += [max_group_size - 1] * (max_group_size - rem)
-        groups.sort()
+        if large_groups_first:
+            groups = groups + [max_group_size - 1] * (max_group_size - rem)
+        else:
+            groups = [max_group_size - 1] * (max_group_size - rem) + groups
         return groups
     else:
-        return findGroupSizes(n_total, max_group_size - 1)
+        return findGroupSizes(n_total, max_group_size - 1, large_groups_first)
 
 
 def assignGroups(group_sizes: List[int], participants: List[T], spreadCriteriaGetters: List[Callable[[T], Any]]) -> List[List[T]]:
